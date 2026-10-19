@@ -402,13 +402,18 @@ function start() {
   $('setup').classList.remove('on');
   ensureAudio();
   if (!audio || audio.state !== 'running') $('sound').classList.add('on');
+  else if (TEST) setTimeout(testFanfar, 1500);
   odswiez().catch(() => {});
   setInterval(() => odswiez().catch(() => {}), ODSWIEZ_MS);
 }
-$('sound-btn').addEventListener('click', () => { ensureAudio(); $('sound').classList.remove('on') });
+// Test fanfar z pilota: adres z ?test (gra po włączeniu dźwięku) albo żółty przycisk pilota; na klawiaturze F
+const TEST = new URLSearchParams(location.search).has('test');
+const testFanfar = () => { ensureAudio(); fanfara({ kto: '184', auta: [{ nazwa: 'Test fanfar', ile: 1 }], marza: 12345 }) };
+const wlaczDzwiek = () => { ensureAudio(); $('sound').classList.remove('on'); if (TEST) setTimeout(testFanfar, 400) };
+$('sound-btn').addEventListener('click', wlaczDzwiek);
 document.addEventListener('keydown', e => {
-  if ($('sound').classList.contains('on') && (e.key === 'Enter' || e.key === ' ')) { ensureAudio(); $('sound').classList.remove('on') }
-  if (e.key === 'f' || e.key === 'F') { ensureAudio(); fanfara({ kto: '184', auta: [{ nazwa: 'Test fanfar', ile: 1 }], marza: 12345 }) } // test fanfar klawiszem F
+  if ($('sound').classList.contains('on') && (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13)) { e.preventDefault(); wlaczDzwiek(); return }
+  if (e.key === 'f' || e.key === 'F' || e.key === 'ColorF2Yellow' || e.keyCode === 405) testFanfar();
 });
 $('setup-form').addEventListener('submit', async e => {
   e.preventDefault();
