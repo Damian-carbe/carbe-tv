@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Carbe TV sprzedaż</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&display=swap">
+<style>
+/* Ekran TV w biurze Carbe (1920×1080). Brand carbe.pl: czerń #0B0B0A, żółty #FFCB38, font Ubuntu.
+   Dane pobierane prosto z Bitrix24 w przeglądarce TV (tylko metody odczytu), odświeżanie co minutę.
+   Plik nie zawiera klucza – webhook wpisuje się raz na ekranie konfiguracji i zostaje w pamięci przeglądarki TV. */
+:root {
+  --black: #0B0B0A;
+  --panel: #171716;
+  --panel-2: #20201e;
+  --line: #2e2e2b;
+  --yellow: #FFCB38;
+  --yellow-soft: rgba(255, 203, 56, .14);
+  --ink: #ffffff;
+  --muted: #a6a6a1;
+  --green: #4ade80;
+  --red: #f87171;
+  --f: "Ubuntu", "Segoe UI", Roboto, sans-serif;
+}
+* { box-sizing: border-box }
+html { font-size: clamp(12px, 1.05vw, 28px) }
+body { margin: 0; background: var(--black); color: var(--ink); font: 1rem/1.35 var(--f); height: 100vh; overflow: hidden }
+.num { font-variant-numeric: tabular-nums }
+.muted { color: var(--muted) }
+
+.screen { height: 100vh; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 1.1rem; padding: 0 1.6rem 1.2rem }
+.top { display: flex; align-items: center; gap: 1.4rem; padding: 1rem 0 .9rem; border-bottom: 3px solid var(--yellow) }
+.top svg.logo { height: 2.3rem; width: auto }
+.top .sep { width: 1px; height: 2rem; background: #3c3c3c }
+.top h1 { margin: 0; font-size: 1.6rem; font-weight: 500 }
+.top h1 b { color: var(--yellow); font-weight: 700 }
+.top .right { margin-left: auto; text-align: right; display: grid; gap: .1rem }
+.top .clock { font-size: 1.9rem; font-weight: 700 }
+.top .stamp { font-size: .85rem; color: var(--muted) }
+.top .stamp.err { color: var(--red) }
+
+.sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem }
+.sec h2 { margin: 0 0 .6rem; font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: .6rem; align-items: baseline }
+.sec h2 span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .9rem }
+.tiles { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: .8rem; align-items: stretch }
+.tile { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 1rem 1rem .9rem; display: grid; gap: .25rem; align-content: start; min-width: 0 }
+.tile.team { background: var(--yellow); color: var(--black); border-color: var(--yellow) }
+.tile.team .lbl, .tile.team .cnt { color: rgba(11, 11, 10, .72) }
+.tile .lbl { font-size: .9rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .5rem }
+.tile .val { font-size: 2.1rem; font-weight: 700; line-height: 1.1; white-space: nowrap }
+.tile.team .val { font-size: 2.6rem }
+.tile .cnt { font-size: 1rem; color: var(--muted) }
+.tile .cnt b { color: var(--ink); font-size: 1.35rem }
+.tile.team .cnt b { color: var(--black) }
+.tile.top { border-color: var(--yellow); box-shadow: 0 0 0 2px var(--yellow) inset, 0 0 2.2rem rgba(255, 203, 56, .25) }
+.crown { position: absolute; top: .55rem; right: .7rem; width: 2.4rem; height: 2.4rem; filter: drop-shadow(0 .2rem .4rem rgba(0,0,0,.6)); animation: bob 2.4s ease-in-out infinite }
+@keyframes bob { 50% { transform: translateY(-.25rem) rotate(-4deg) } }
+.ava { width: 1.9rem; height: 1.9rem; border-radius: 50%; object-fit: cover; background: var(--panel-2); flex: none; display: grid; place-items: center; font-size: .8rem; font-weight: 700; color: var(--yellow); overflow: hidden }
+.ava img { width: 100%; height: 100%; object-fit: cover }
+
+.list { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0 }
+.list .head { display: flex; align-items: baseline; gap: .8rem; padding: .8rem 1rem .5rem }
+.list .head h2 { margin: 0; font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted) }
+.scroller { overflow: hidden; min-height: 0 }
+table { width: 100%; border-collapse: collapse; font-size: 1.05rem }
+th { position: sticky; top: 0; background: var(--panel); text-align: left; font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: .45rem .7rem; border-bottom: 2px solid var(--yellow); white-space: nowrap }
+td { padding: .6rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top }
+th.r, td.r { text-align: right; white-space: nowrap }
+td.car b { font-weight: 500 }
+td.car .q { display: inline-block; margin-left: .4rem; padding: 0 .4rem; border-radius: 2px; background: var(--yellow-soft); color: var(--yellow); font-weight: 700; font-size: .9rem }
+td.fin .sub { color: var(--muted); font-size: .9rem }
+td.marza { color: var(--yellow); font-weight: 700 }
+.st { display: inline-block; padding: .1rem .55rem; border-radius: 2px; font-size: .85rem; font-weight: 700; white-space: nowrap }
+.st.otwarta { background: var(--panel-2); color: var(--ink); border: 1px solid #44443f }
+.st.rozliczona { background: rgba(74, 222, 128, .15); color: var(--green) }
+.st.przegrana { background: rgba(248, 113, 113, .15); color: var(--red) }
+tr.fresh td { animation: fresh 3s ease-out 3 }
+@keyframes fresh { 0% { background: rgba(255, 203, 56, .35) } 100% { background: transparent } }
+.empty { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-size: 1.2rem }
+
+/* Fanfary */
+.fanfare { position: fixed; inset: 0; display: none; place-items: center; background: rgba(11, 11, 10, .88); z-index: 10; overflow: hidden }
+.fanfare.on { display: grid }
+.fanfare .card { text-align: center; display: grid; gap: .8rem; animation: pop .6s cubic-bezier(.2, 1.6, .4, 1) }
+.fanfare .card svg { width: 7rem; height: 7rem; margin: 0 auto }
+.fanfare .t1 { font-size: 2rem; letter-spacing: .12em; text-transform: uppercase; color: var(--yellow); font-weight: 700 }
+.fanfare .t2 { font-size: 4.2rem; font-weight: 700 }
+.fanfare .t3 { font-size: 2.2rem; color: var(--muted) }
+.fanfare .t3 b { color: var(--yellow) }
+@keyframes pop { 0% { transform: scale(.4); opacity: 0 } 100% { transform: scale(1); opacity: 1 } }
+.confetti { position: absolute; top: -5vh; width: .9rem; height: 1.4rem; border-radius: 2px; animation: fall linear forwards }
+@keyframes fall { to { transform: translateY(115vh) rotate(720deg) } }
+
+/* Konfiguracja i włączenie dźwięku */
+.overlay { position: fixed; inset: 0; display: none; place-items: center; background: rgba(11, 11, 10, .94); z-index: 20; padding: 2rem }
+.overlay.on { display: grid }
+.overlay .box { max-width: 52rem; width: 100%; background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--yellow); border-radius: 4px; padding: 2rem; display: grid; gap: 1rem }
+.overlay h2 { margin: 0; font-size: 1.8rem }
+.overlay p { margin: 0; color: var(--muted); font-size: 1.1rem }
+.overlay input { font: inherit; font-size: 1.1rem; padding: .8rem; border-radius: 4px; border: 1px solid #44443f; background: var(--black); color: var(--ink); width: 100% }
+.overlay button { font: inherit; font-size: 1.3rem; font-weight: 700; padding: .9rem 1.6rem; border: 0; border-radius: 4px; background: var(--yellow); color: var(--black); cursor: pointer; justify-self: start }
+.overlay button:focus-visible, .overlay input:focus-visible { outline: 3px solid #fff; outline-offset: 2px }
+.overlay .err { color: var(--red); font-size: 1rem; min-height: 1.2em }
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="top">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 152 34" fill="none" role="img" aria-label="Carbe"><path d="M151.728 0.649428V7.93317H137.254V12.8232H150.365V20.0727H137.254V25.2705H152V32.5543H128.842V0.615234H151.728V0.649428Z" fill="#FFCB05"/><path d="M114.843 10.2595C114.878 9.43875 114.537 8.65225 113.924 8.10511C113.175 7.52378 112.255 7.25022 111.336 7.31861H106.159V13.2003H111.336C112.255 13.3029 113.175 13.0293 113.924 12.448C114.537 11.9009 114.878 11.1144 114.843 10.2937M116.07 22.6384C116.206 21.6125 115.763 20.6208 114.912 20.0053C113.958 19.4924 112.902 19.253 111.847 19.2872H106.125V25.9554H111.847C112.902 25.9896 113.958 25.7502 114.912 25.2373C115.729 24.656 116.172 23.6301 116.07 22.6042V22.6384ZM112.119 0.650391C115.593 0.650391 118.317 1.30012 120.292 2.59956C122.302 3.9674 123.426 6.29273 123.255 8.72064C123.323 10.2595 122.881 11.7983 122.063 13.0977C121.178 14.2946 119.952 15.1837 118.556 15.6624C119.373 15.9018 120.19 16.2438 120.905 16.6883C121.621 17.1329 122.268 17.68 122.813 18.3297C123.358 19.0136 123.8 19.7659 124.073 20.6208C124.379 21.5783 124.55 22.57 124.515 23.5617C124.584 25.1347 124.175 26.7077 123.323 28.0414C122.54 29.204 121.484 30.1273 120.292 30.8112C118.998 31.5294 117.602 32.0081 116.138 32.2133C114.639 32.4868 113.107 32.5894 111.574 32.5894H97.7812V0.650391H112.119Z" fill="#FFCB05"/><path d="M46.2877 24.7927C46.2877 27.46 45.8449 30.0931 44.8913 32.5894H49.7614C49.5911 29.9563 49.2846 27.3574 48.8078 24.7927H46.2877ZM40.4981 12.448C43.461 14.9101 45.4362 18.3297 46.0493 22.1597H48.1948C46.492 15.936 40.464 12.448 40.464 12.448H40.4981ZM36.6838 11.3537L28.374 32.6236H33.5506C42.2349 23.6301 39.1699 15.3889 36.6838 11.3537ZM57.6625 32.5894H62.4303L49.9317 0.650391H40.8386L37.6033 8.92582C53.8482 10.9092 57.2197 29.546 57.6625 32.5894Z" fill="white"/><path d="M0.00602388 17.098C-0.0620888 14.4307 0.448756 11.7976 1.47045 9.3355C2.35591 7.28374 3.68411 5.47136 5.38692 4.03513C6.98757 2.66729 8.89473 1.60721 10.904 0.991683C12.9474 0.34196 15.0589 0 17.2045 0C18.8051 0 20.4058 0.170979 22.0064 0.512938C23.5389 0.820702 25.0374 1.33364 26.4337 2.01756V9.98522C25.378 9.13032 24.186 8.4806 22.9259 8.07025C21.5637 7.6257 20.1333 7.38633 18.6689 7.38633C17.4088 7.38633 16.1828 7.55731 14.9568 7.93346C13.7988 8.27542 12.709 8.85676 11.7555 9.64327C10.7678 10.464 10.0186 11.4898 9.47368 12.6525C8.86067 14.0545 8.55416 15.5592 8.62227 17.098C8.58822 18.4658 8.89472 19.8337 9.47368 21.0989C10.0186 22.159 10.7678 23.0823 11.7214 23.8004C12.675 24.5185 13.7648 25.0315 14.8886 25.3392C16.0806 25.6812 17.3066 25.8522 18.5327 25.8522C20.0993 25.8522 21.6318 25.6128 23.1303 25.134C24.4244 24.7237 25.6164 24.0056 26.6381 23.0823V31.2893C23.7433 32.6572 20.576 33.3411 17.3748 33.3069C15.1951 33.3069 13.0496 32.9991 10.9722 32.3836C8.96284 31.8023 7.05568 30.8106 5.42098 29.4769C3.75222 28.1091 2.42402 26.3993 1.5045 24.4501C0.448756 22.1248 -0.0620888 19.6285 0.00602388 17.098Z" fill="white"/><path d="M85.7935 20.996C86.645 20.6541 87.4623 20.1753 88.2115 19.6282C88.9608 19.0811 89.6078 18.3971 90.1528 17.6448C90.7317 16.8241 91.1404 15.9008 91.4128 14.9433C91.7193 13.7807 91.8896 12.618 91.8556 11.4212C91.9237 9.60877 91.515 7.83058 90.7317 6.18917C90.0165 4.85553 88.9948 3.72707 87.7688 2.87217C86.5087 2.05146 85.0784 1.43594 83.5799 1.12817C82.0133 0.786213 80.4126 0.615234 78.8461 0.615234H65.4619V32.5201H73.8738V22.1245H77.5179L85.1124 32.5201H94.6141L85.8617 20.9276L85.7935 20.996ZM82.1495 14.4304C81.2981 15.0801 80.2764 15.3879 79.2207 15.3537H73.8738V7.96737H79.2207C80.2764 7.93317 81.2981 8.24093 82.1495 8.89066C83.648 10.4637 83.648 12.8916 82.1495 14.4646V14.4304Z" fill="white"/></svg>
+    <span class="sep" aria-hidden="true"></span>
+    <h1>Sprzedaż · <b id="month">–</b></h1>
+    <div class="right">
+      <span class="clock num" id="clock">–</span>
+      <span class="stamp" id="stamp">Łączę z Bitrix24…</span>
+    </div>
+  </div>
+
+  <div class="sections">
+    <section class="sec"><h2>Podpisane umowy brokerskie <span>marża brutto · liczba umów</span></h2><div class="tiles" id="tiles-umowy"></div></section>
+    <section class="sec"><h2>Rozliczone <span>Leasing i Najem finansowanie · „Deal wygrany”</span></h2><div class="tiles" id="tiles-rozl"></div></section>
+  </div>
+
+  <section class="list">
+    <div class="head"><h2>Umowy brokerskie w tym miesiącu</h2><span class="muted" id="list-count"></span></div>
+    <div class="scroller" id="scroller"><div class="empty">Wczytuję…</div></div>
+  </section>
+</div>
+
+<div class="fanfare" id="fanfare" aria-live="assertive"></div>
+
+<div class="overlay" id="setup">
+  <form class="box" id="setup-form">
+    <h2>Połącz ekran z Bitrix24</h2>
+    <p>Wklej adres webhooka przychodzącego z Bitrix24 (uprawnienia: crm, user). Zostanie zapisany tylko w tej przeglądarce. Ekran korzysta wyłącznie z metod odczytu.</p>
+    <input id="setup-url" type="url" placeholder="https://carbe.bitrix24.pl/rest/…/…/" autocomplete="off" spellcheck="false" required>
+    <div class="err" id="setup-err"></div>
+    <button type="submit">Połącz</button>
+  </form>
+</div>
+
+<div class="overlay" id="sound">
+  <div class="box">
+    <h2>Włącz dźwięk fanfar</h2>
+    <p>Przeglądarka odtworzy dźwięk dopiero po jednym kliknięciu. Naciśnij OK na pilocie albo kliknij przycisk.</p>
+    <button type="button" id="sound-btn" autofocus>Włącz dźwięk</button>
+  </div>
+</div>
+
+<script>
+// ---- Ustawienia ----
+const HANDLOWCY = [ // kolejność kafli
+  { id: '184', imie: 'Mateusz Uzarczyk' },
+  { id: '46', imie: 'Damian Kutarasiński' },
+  { id: '134', imie: 'Michał Wróblewski' },
+];
+const UMOWA = 'UC_FJT3BE';                       // „Podpisana Umowa brokerska” w lejku „Sprzedaż własna”
+const ROZLICZONE = ['C22:WON', 'C30:WON'];       // „Deal wygrany” w Leasing finansowanie (22) i Najem finansowanie (30)
+const LEJKI_FIN = [22, 30];
+const POLE = {
+  typ: 'UF_CRM_1765971668869',        // Typ finansowania
+  finansujacy: 'UF_CRM_1789133563265',// Finansujący
+  rez: 'UF_CRM_1772031090717',        // Opłata rezerwacyjna brutto
+  brok: 'UF_CRM_1765543963858',       // Opłata brokerska brutto
+  prow: 'UF_CRM_1779357017852',       // Prowizja z finansowania brutto
+};
+const ODSWIEZ_MS = 60 * 1000;
+const KLUCZ_HOOK = 'carbe-tv-webhook';
+const KLUCZ_WIDZIANE = 'carbe-tv-widziane';
+
+// ---- Pomocnicze ----
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const zl = v => new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 0 }).format(Math.round(v || 0)) + ' zł';
+const money = v => parseFloat(String(v ?? '').split('|')[0]) || 0;
+const pad = n => String(n).padStart(2, '0');
+const isoLocal = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+const store = {
+  get(k) { try { return localStorage.getItem(k) } catch (e) { return null } },
+  set(k, v) { try { localStorage.setItem(k, v) } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k) } catch (e) {} },
+};
+const CROWN = '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M6 22l14 12 12-20 12 20 14-12-6 28H12z" fill="#FFCB38" stroke="#0B0B0A" stroke-width="3" stroke-linejoin="round"/><rect x="12" y="50" width="40" height="7" rx="1.5" fill="#FFCB38" stroke="#0B0B0A" stroke-width="3"/><circle cx="6" cy="20" r="4.5" fill="#FFCB38" stroke="#0B0B0A" stroke-width="2.5"/><circle cx="32" cy="11" r="4.5" fill="#FFCB38" stroke="#0B0B0A" stroke-width="2.5"/><circle cx="58" cy="20" r="4.5" fill="#FFCB38" stroke="#0B0B0A" stroke-width="2.5"/></svg>';
+
+// ---- Bitrix24 REST (tylko odczyt) ----
+let HOOK = (new URLSearchParams(location.search).has('reset') ? (store.del(KLUCZ_HOOK), '') : '') || window.CARBE_TV_WEBHOOK || store.get(KLUCZ_HOOK) || '';
+async function call(method, params = {}) {
+  const r = await fetch(HOOK + method + '.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || j.error) throw new Error(j.error_description || j.error || ('HTTP ' + r.status));
+  return j;
+}
+async function list(method, params) {
+  let out = [], start = 0;
+  do {
+    const j = await call(method, { ...params, start });
+    const res = Array.isArray(j.result) ? j.result : (j.result?.items || j.result?.tasks || []);
+    out = out.concat(res);
+    start = j.next;
+  } while (start);
+  return out;
+}
+const chunks = (a, n = 50) => { const o = []; for (let i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o };
+async function dealsById(ids, select) {
+  let out = [];
+  for (const c of chunks(ids)) out = out.concat(await list('crm.deal.list', { filter: { ID: c }, select }));
+  return out;
+}
+function firstByOwner(rows) {
+  const m = {};
+  rows.slice().sort((a, b) => new Date(a.CREATED_TIME) - new Date(b.CREATED_TIME))
+    .forEach(r => { const k = String(r.OWNER_ID); if (!(k in m)) m[k] = new Date(r.CREATED_TIME) });
+  return m;
+}
+
+// ---- Dane ----
+let meta = null;
+async function loadMeta() {
+  const f = (await call('crm.deal.fields')).result;
+  const en = code => Object.fromEntries((f[code]?.items || []).map(i => [String(i.ID), i.VALUE]));
+  const users = {};
+  try {
+    const u = (await call('user.get', { filter: { ID: HANDLOWCY.map(h => h.id) } })).result || [];
+    u.forEach(x => users[String(x.ID)] = { imie: `${x.NAME || ''} ${x.LAST_NAME || ''}`.trim(), foto: x.PERSONAL_PHOTO || '' });
+  } catch (e) { /* bez zakresu user – zostają nazwiska z ustawień */ }
+  meta = { typ: en(POLE.typ), fin: en(POLE.finansujacy), users };
+}
+
+async function loadMonth(ms) {
+  const od = isoLocal(ms);
+  // 1. Podpisane umowy: pierwsze przejście na „Podpisana Umowa” w tym miesiącu (deal podpisany już wcześniej nie liczy się drugi raz)
+  const naUmowe = firstByOwner(await list('crm.stagehistory.list', { entityTypeId: 2, filter: { STAGE_ID: UMOWA, '>=CREATED_TIME': od }, select: ['OWNER_ID', 'CREATED_TIME'] }));
+  let ids = Object.keys(naUmowe);
+  const wczesniej = new Set();
+  for (const c of chunks(ids)) (await list('crm.stagehistory.list', { entityTypeId: 2, filter: { STAGE_ID: UMOWA, '<CREATED_TIME': od, OWNER_ID: c }, select: ['OWNER_ID'] })).forEach(r => wczesniej.add(String(r.OWNER_ID)));
+  ids = ids.filter(id => !wczesniej.has(id));
+  const sprzedaz = ids.length ? await dealsById(ids, ['ID', 'TITLE', 'ASSIGNED_BY_ID', 'OPPORTUNITY', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', POLE.typ, POLE.rez, POLE.brok, POLE.prow]) : [];
+
+  // 2. Rozliczone: pierwsze przejście na „Deal wygrany” w lejkach finansowania w tym miesiącu
+  const naWygrany = firstByOwner(await list('crm.stagehistory.list', { entityTypeId: 2, filter: { STAGE_ID: ROZLICZONE, '>=CREATED_TIME': od }, select: ['OWNER_ID', 'CREATED_TIME'] }));
+  // Deale finansowania: założone od początku miesiąca (kopie podpisanych umów) + rozliczone w tym miesiącu
+  const selFin = ['ID', 'CATEGORY_ID', 'STAGE_ID', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', 'CREATED_BY_ID', 'OPPORTUNITY', 'DATE_CREATE', POLE.finansujacy, POLE.typ];
+  const fin = {};
+  (await list('crm.deal.list', { filter: { CATEGORY_ID: LEJKI_FIN, '>=DATE_CREATE': isoLocal(new Date(ms.getTime() - 864e5)) }, select: selFin })).forEach(d => fin[d.ID] = d);
+  const brak = Object.keys(naWygrany).filter(id => !fin[id]);
+  if (brak.length) (await dealsById(brak, selFin)).forEach(d => fin[d.ID] = d);
+
+  // Powiązanie umowy z dealem finansowania: ta sama firma albo kontakt, deal finansowania założony przy podpisaniu umowy lub później
+  const uzyte = new Set(), finDla = {}, sprzedazDlaFin = {};
+  sprzedaz.slice().sort((a, b) => naUmowe[a.ID] - naUmowe[b.ID]).forEach(s => {
+    const t = naUmowe[s.ID].getTime() - 10 * 60 * 1000;
+    const pasuje = f => (+s.COMPANY_ID && String(f.COMPANY_ID) === String(s.COMPANY_ID)) || (+s.CONTACT_ID && String(f.CONTACT_ID) === String(s.CONTACT_ID));
+    const kand = Object.values(fin).filter(f => !uzyte.has(f.ID) && pasuje(f) && new Date(f.DATE_CREATE).getTime() >= t)
+      .sort((a, b) => new Date(a.DATE_CREATE) - new Date(b.DATE_CREATE));
+    if (kand.length) { uzyte.add(kand[0].ID); finDla[s.ID] = kand[0]; sprzedazDlaFin[kand[0].ID] = s }
+  });
+
+  // Produkty (model i liczba aut) – jednym zapytaniem batch
+  const produkty = {};
+  for (const c of chunks(sprzedaz.map(s => s.ID), 50)) {
+    const cmd = {}; c.forEach(id => cmd['p' + id] = `crm.deal.productrows.get?id=${id}`);
+    const j = await call('batch', { halt: 0, cmd });
+    const r = j.result?.result || {};
+    c.forEach(id => produkty[id] = r['p' + id] || []);
+  }
+
+  const umowy = sprzedaz.map(s => {
+    const f = finDla[s.ID];
+    const p = produkty[s.ID] || [];
+    const status = f && /:WON$/.test(f.STAGE_ID) ? 'rozliczona'
+      : ((f && f.STAGE_SEMANTIC_ID === 'F') || s.STAGE_SEMANTIC_ID === 'F') ? 'przegrana' : 'otwarta';
+    return {
+      id: String(s.ID), kiedy: naUmowe[s.ID], kto: String(s.ASSIGNED_BY_ID),
+      auta: p.map(x => ({ nazwa: x.PRODUCT_NAME, ile: +x.QUANTITY || 1 })),
+      typ: meta.typ[String((f && f[POLE.typ]) || s[POLE.typ] || '')] || '',
+      finansujacy: f ? (meta.fin[String(f[POLE.finansujacy] || '')] || '') : '',
+      rez: money(s[POLE.rez]), brok: money(s[POLE.brok]), prow: money(s[POLE.prow]),
+      marza: parseFloat(s.OPPORTUNITY) || 0, status,
+    };
+  }).sort((a, b) => b.kiedy - a.kiedy);
+
+  const rozliczone = Object.keys(naWygrany).map(id => fin[id]).filter(Boolean).map(f => ({
+    id: String(f.ID),
+    // handlowiec: z powiązanej umowy z tego miesiąca, a jeśli umowa była wcześniej – osoba, która przesunęła deal na umowę (autor kopii)
+    kto: String(sprzedazDlaFin[f.ID]?.ASSIGNED_BY_ID || f.CREATED_BY_ID),
+    marza: parseFloat(f.OPPORTUNITY) || 0,
+  }));
+  return { umowy, rozliczone };
+}
+
+// ---- Widok ----
+const nazwa = id => meta?.users[id]?.imie || HANDLOWCY.find(h => h.id === id)?.imie || 'Inna osoba';
+const inicjaly = s => s.split(' ').map(x => x[0] || '').join('').slice(0, 2).toUpperCase();
+function ava(id) {
+  const f = meta?.users[id]?.foto;
+  return `<span class="ava">${f ? `<img src="${esc(f)}" alt="" onerror="this.replaceWith(document.createTextNode('${inicjaly(nazwa(id))}'))">` : esc(inicjaly(nazwa(id)))}</span>`;
+}
+function tiles(el, rows, slowo) {
+  const suma = rows.reduce((a, r) => a + r.marza, 0);
+  const os = HANDLOWCY.map(h => { const r = rows.filter(x => x.kto === h.id); return { id: h.id, marza: r.reduce((a, x) => a + x.marza, 0), ile: r.length } });
+  const max = Math.max(0, ...os.map(o => o.marza));
+  let html = `<div class="tile team"><span class="lbl">Zespół</span><span class="val num">${zl(suma)}</span><span class="cnt"><b class="num">${rows.length}</b> ${slowo(rows.length)}</span></div>`;
+  html += os.map(o => {
+    const top = max > 0 && o.marza === max;
+    return `<div class="tile${top ? ' top' : ''}">${top ? `<span class="crown">${CROWN}</span>` : ''}
+      <span class="lbl">${ava(o.id)}${esc(nazwa(o.id).split(' ')[0])}</span>
+      <span class="val num">${zl(o.marza)}</span><span class="cnt"><b class="num">${o.ile}</b> ${slowo(o.ile)}</span></div>`;
+  }).join('');
+  el.innerHTML = html;
+}
+const slowoUmowa = n => n === 1 ? 'umowa' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'umowy' : 'umów';
+const slowoDeal = n => n === 1 ? 'deal' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'deale' : 'deali';
+
+let swieze = new Set();
+function render(d) {
+  tiles($('tiles-umowy'), d.umowy, slowoUmowa);
+  tiles($('tiles-rozl'), d.rozliczone, slowoDeal);
+  $('list-count').textContent = d.umowy.length ? `${d.umowy.length} · ${d.umowy.reduce((a, u) => a + u.auta.reduce((x, y) => x + y.ile, 0), 0)} aut` : '';
+  if (!d.umowy.length) { $('scroller').innerHTML = '<div class="empty">W tym miesiącu nie ma jeszcze podpisanych umów. Pierwsza odpali fanfary.</div>'; return }
+  const rows = d.umowy.map(u => `<tr class="${swieze.has(u.id) ? 'fresh' : ''}">
+    <td class="num">${pad(u.kiedy.getDate())}.${pad(u.kiedy.getMonth() + 1)}</td>
+    <td>${esc(nazwa(u.kto))}</td>
+    <td class="car">${u.auta.length ? u.auta.map(a => `<b>${esc(a.nazwa)}</b><span class="q num">×${a.ile}</span>`).join('<br>') : '<span class="muted">brak modelu</span>'}</td>
+    <td class="fin">${esc(u.typ) || '<span class="muted">–</span>'}<div class="sub">${esc(u.finansujacy) || 'finansujący: –'}</div></td>
+    <td class="r num">${zl(u.rez)}</td><td class="r num">${zl(u.brok)}</td><td class="r num">${zl(u.prow)}</td>
+    <td class="r num marza">${zl(u.marza)}</td>
+    <td><span class="st ${u.status}">${u.status === 'otwarta' ? 'Otwarta' : u.status === 'rozliczona' ? 'Rozliczona' : 'Przegrana'}</span></td></tr>`).join('');
+  $('scroller').innerHTML = `<table><thead><tr><th>Data</th><th>Handlowiec</th><th>Samochód · ilość</th><th>Forma · finansujący</th><th class="r">Opł. rez.</th><th class="r">Opł. brok.</th><th class="r">Prowizja fin.</th><th class="r">Marża</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+// Przewijanie listy, gdy nie mieści się na ekranie
+let scrollPause = 0;
+setInterval(() => {
+  const s = $('scroller'); if (!s || s.scrollHeight <= s.clientHeight + 2) return;
+  if (scrollPause > 0) { scrollPause--; return }
+  if (s.scrollTop + s.clientHeight >= s.scrollHeight - 1) { scrollPause = 120; setTimeout(() => { s.scrollTop = 0; scrollPause = 120 }, 4000); return }
+  s.scrollTop += 1;
+}, 40);
+
+// ---- Fanfary ----
+let audio = null;
+function ensureAudio() { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === 'suspended') audio.resume() } catch (e) {} }
+function fanfaraDzwiek() {
+  if (!audio || audio.state !== 'running') return;
+  const t0 = audio.currentTime + .05;
+  // „ta-da-da-daaa” – G4 C5 E5 G5, pauza, E5 G5 (dźwięk trąbki z fali piłokształtnej)
+  [[392, 0, .16], [523.25, .18, .16], [659.25, .36, .16], [783.99, .54, .5], [659.25, 1.12, .14], [783.99, 1.3, 1.1]].forEach(([f, s, d]) => {
+    [1, 2].forEach((h, i) => {
+      const o = audio.createOscillator(), g = audio.createGain(), lp = audio.createBiquadFilter();
+      o.type = 'sawtooth'; o.frequency.value = f * h; lp.type = 'lowpass'; lp.frequency.value = 2400;
+      const v = i ? .05 : .16;
+      g.gain.setValueAtTime(0, t0 + s); g.gain.linearRampToValueAtTime(v, t0 + s + .03); g.gain.setValueAtTime(v, t0 + s + d - .05); g.gain.linearRampToValueAtTime(0, t0 + s + d + .08);
+      o.connect(lp).connect(g).connect(audio.destination); o.start(t0 + s); o.stop(t0 + s + d + .1);
+    });
+  });
+}
+const kolejka = [];
+let trwa = false;
+function fanfara(u) { kolejka.push(u); if (!trwa) nastepna() }
+function nastepna() {
+  const u = kolejka.shift(); if (!u) { trwa = false; return }
+  trwa = true;
+  const el = $('fanfare');
+  const auta = u.auta.map(a => `${a.nazwa}${a.ile > 1 ? ' ×' + a.ile : ''}`).join(', ');
+  el.innerHTML = `<div class="card">${CROWN}<div class="t1">Nowa umowa brokerska!</div><div class="t2">${esc(nazwa(u.kto))}</div><div class="t3">${esc(auta)}${auta ? ' · ' : ''}<b class="num">${zl(u.marza)}</b></div></div>` +
+    Array.from({ length: 90 }, () => `<i class="confetti" style="left:${Math.random() * 100}vw;background:${['#FFCB38', '#ffffff', '#FFCB38', '#a6a6a1'][Math.floor(Math.random() * 4)]};animation-duration:${2.5 + Math.random() * 3}s;animation-delay:${Math.random() * 1.5}s"></i>`).join('');
+  el.classList.add('on');
+  fanfaraDzwiek();
+  setTimeout(() => { el.classList.remove('on'); el.innerHTML = ''; setTimeout(nastepna, 600) }, 9000);
+}
+
+// ---- Pętla ----
+let miesiac = null;
+async function odswiez() {
+  if (!HOOK) return;
+  const now = new Date(), ms = new Date(now.getFullYear(), now.getMonth(), 1);
+  try {
+    if (!meta) await loadMeta();
+    const d = await loadMonth(ms);
+    const klucz = `${ms.getFullYear()}-${pad(ms.getMonth() + 1)}`;
+    let widziane = null; try { widziane = JSON.parse(store.get(KLUCZ_WIDZIANE) || 'null') } catch (e) {}
+    const nowe = widziane && widziane.m === klucz ? d.umowy.filter(u => !widziane.ids.includes(u.id)) : [];
+    swieze = new Set(nowe.map(u => u.id));
+    store.set(KLUCZ_WIDZIANE, JSON.stringify({ m: klucz, ids: d.umowy.map(u => u.id) }));
+    $('month').textContent = ms.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
+    render(d);
+    nowe.slice().reverse().forEach(fanfara);
+    $('stamp').textContent = 'Bitrix24 · odświeżono ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+    $('stamp').classList.remove('err');
+    return true;
+  } catch (e) {
+    $('stamp').textContent = 'Brak połączenia z Bitrix24 (' + e.message + ') – ponawiam';
+    $('stamp').classList.add('err');
+    throw e;
+  }
+}
+setInterval(() => { $('clock').textContent = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) }, 1000);
+
+function start() {
+  $('setup').classList.remove('on');
+  ensureAudio();
+  if (!audio || audio.state !== 'running') $('sound').classList.add('on');
+  odswiez().catch(() => {});
+  setInterval(() => odswiez().catch(() => {}), ODSWIEZ_MS);
+}
+$('sound-btn').addEventListener('click', () => { ensureAudio(); $('sound').classList.remove('on') });
+document.addEventListener('keydown', e => {
+  if ($('sound').classList.contains('on') && (e.key === 'Enter' || e.key === ' ')) { ensureAudio(); $('sound').classList.remove('on') }
+  if (e.key === 'f' || e.key === 'F') { ensureAudio(); fanfara({ kto: '184', auta: [{ nazwa: 'Test fanfar', ile: 1 }], marza: 12345 }) } // test fanfar klawiszem F
+});
+$('setup-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  let u = $('setup-url').value.trim(); if (!u.endsWith('/')) u += '/';
+  HOOK = u; $('setup-err').textContent = 'Sprawdzam połączenie…';
+  try { await call('crm.deal.fields'); store.set(KLUCZ_HOOK, u); start() }
+  catch (err) { HOOK = ''; $('setup-err').textContent = 'Nie udało się połączyć: ' + err.message }
+});
+if (HOOK) start(); else $('setup').classList.add('on');
+</script>
+</body>
+</html>
