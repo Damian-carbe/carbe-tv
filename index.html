@@ -163,6 +163,14 @@ const HANDLOWCY = [ // kolejność kafli
 const UMOWA = 'UC_FJT3BE';                       // „Podpisana Umowa brokerska” w lejku „Sprzedaż własna”
 const ROZLICZONE = ['C22:WON', 'C30:WON'];       // „Deal wygrany” w Leasing finansowanie (22) i Najem finansowanie (30)
 const LEJKI_FIN = [22, 30];
+// Deale testowe (np. testy podpisu elektronicznego i integracji z Taxxo 21–22.10) – nie liczą się nigdzie i nie odpalają fanfar.
+// Test = firma lub kontakt testowy albo słowo „test” w tytule deala. Nowe testy: zakładać na tej firmie/kontakcie albo z „TEST” w tytule.
+const TESTY = {
+  firmy: ['4284'],             // firma „Damian Kutarasiński”
+  kontakty: ['22890', '21886'],// kontakty testowe: Michał Wróblewski, Damian Kutarasiński
+  tytul: /test/i,
+};
+const testowy = d => TESTY.firmy.includes(String(d.COMPANY_ID || '')) || TESTY.kontakty.includes(String(d.CONTACT_ID || '')) || TESTY.tytul.test(d.TITLE || '');
 const POLE = {
   typ: 'UF_CRM_1765971668869',        // Typ finansowania
   finansujacy: 'UF_CRM_1789133563265',// Finansujący
@@ -240,16 +248,16 @@ async function loadMonth(ms) {
   const wczesniej = new Set();
   for (const c of chunks(ids)) (await list('crm.stagehistory.list', { entityTypeId: 2, filter: { STAGE_ID: UMOWA, '<CREATED_TIME': od, OWNER_ID: c }, select: ['OWNER_ID'] })).forEach(r => wczesniej.add(String(r.OWNER_ID)));
   ids = ids.filter(id => !wczesniej.has(id));
-  const sprzedaz = ids.length ? await dealsById(ids, ['ID', 'TITLE', 'ASSIGNED_BY_ID', 'OPPORTUNITY', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', POLE.typ, POLE.rez, POLE.brok, POLE.prow]) : [];
+  const sprzedaz = ids.length ? await dealsById(ids, ['ID', 'TITLE', 'ASSIGNED_BY_ID', 'OPPORTUNITY', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', POLE.typ, POLE.rez, POLE.brok, POLE.prow]).then(a => a.filter(d => !testowy(d))) : [];
 
   // 2. Rozliczone: pierwsze przejście na „Deal wygrany” w lejkach finansowania w tym miesiącu
   const naWygrany = firstByOwner(await list('crm.stagehistory.list', { entityTypeId: 2, filter: { STAGE_ID: ROZLICZONE, '>=CREATED_TIME': od }, select: ['OWNER_ID', 'CREATED_TIME'] }));
   // Deale finansowania: założone od początku miesiąca (kopie podpisanych umów) + rozliczone w tym miesiącu
-  const selFin = ['ID', 'CATEGORY_ID', 'STAGE_ID', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', 'CREATED_BY_ID', 'OPPORTUNITY', 'DATE_CREATE', POLE.finansujacy, POLE.typ];
+  const selFin = ['ID', 'TITLE', 'CATEGORY_ID', 'STAGE_ID', 'STAGE_SEMANTIC_ID', 'COMPANY_ID', 'CONTACT_ID', 'CREATED_BY_ID', 'OPPORTUNITY', 'DATE_CREATE', POLE.finansujacy, POLE.typ];
   const fin = {};
-  (await list('crm.deal.list', { filter: { CATEGORY_ID: LEJKI_FIN, '>=DATE_CREATE': isoLocal(new Date(ms.getTime() - 864e5)) }, select: selFin })).forEach(d => fin[d.ID] = d);
+  (await list('crm.deal.list', { filter: { CATEGORY_ID: LEJKI_FIN, '>=DATE_CREATE': isoLocal(new Date(ms.getTime() - 864e5)) }, select: selFin })).filter(d => !testowy(d)).forEach(d => fin[d.ID] = d);
   const brak = Object.keys(naWygrany).filter(id => !fin[id]);
-  if (brak.length) (await dealsById(brak, selFin)).forEach(d => fin[d.ID] = d);
+  if (brak.length) (await dealsById(brak, selFin)).filter(d => !testowy(d)).forEach(d => fin[d.ID] = d);
 
   // Powiązanie umowy z dealem finansowania: ta sama firma albo kontakt, deal finansowania założony przy podpisaniu umowy lub później
   const uzyte = new Set(), finDla = {}, sprzedazDlaFin = {};
