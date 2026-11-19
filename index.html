@@ -31,7 +31,7 @@ body { margin: 0; background: var(--black); color: var(--ink); font: 1rem/1.35 v
 .num { font-variant-numeric: tabular-nums }
 .muted { color: var(--muted) }
 
-.screen { height: 100vh; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: 1.1rem; padding: 0 1.6rem 1.2rem }
+.screen { height: 100vh; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: .8rem; padding: 0 1.6rem 1rem }
 .top { display: flex; align-items: center; gap: 1.4rem; padding: 1rem 0 .9rem; border-bottom: 3px solid var(--yellow) }
 .top svg.logo { height: 2.3rem; width: auto }
 .top .sep { width: 1px; height: 2rem; background: #3c3c3c }
@@ -42,25 +42,25 @@ body { margin: 0; background: var(--black); color: var(--ink); font: 1rem/1.35 v
 .top .stamp { font-size: .85rem; color: var(--muted) }
 .top .stamp.err { color: var(--red) }
 
-.sections { display: grid; gap: 1rem }
-.sec h2 { margin: 0 0 .5rem; font-size: 1.25rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: .6rem; align-items: baseline }
-.sec h2 span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 1rem }
+.sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem }
+.sec h2 { margin: 0 0 .4rem; font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: .6rem; align-items: baseline }
+.sec h2 span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 /* zawsze ta sama siatka: zespół + miejsca na 3 handlowców (puste, gdy ktoś nie ma wyniku) – kafle nie skaczą */
-.tiles { display: grid; grid-template-columns: minmax(0, 1.35fr) repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: stretch }
-.tile { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: .9rem 1.3rem 1rem; display: grid; gap: .2rem; align-content: start; min-width: 0 }
+.tiles { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)); gap: .6rem; align-items: stretch }
+.tile { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: .6rem .8rem .7rem; display: grid; gap: .2rem; align-content: start; min-width: 0 }
 .tile.team { background: var(--yellow); color: var(--black); border-color: var(--yellow) }
 .tile.team .lbl, .tile.team .cnt { color: rgba(11, 11, 10, .72) }
-.tile .lbl { font-size: 1.45rem; font-weight: 500; color: #e6e6e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .7rem; padding-right: 3.6rem }
+.tile .lbl { font-size: 1.15rem; font-weight: 500; color: #e6e6e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .5rem; padding-right: 2.4rem }
 .tile.team .lbl { padding-right: 0 }
-.tile .val { font-size: 3.5rem; font-weight: 700; line-height: 1.05; white-space: nowrap }
-.tile.team .val { font-size: 4.4rem }
-.tile .cnt { font-size: 1.45rem; color: var(--muted) }
-.tile .cnt b { color: var(--ink); font-size: 2rem }
+.tile .val { font-size: 1.8rem; font-weight: 700; line-height: 1.05; white-space: nowrap }
+.tile.team .val { font-size: 2.2rem }
+.tile .cnt { font-size: 1.05rem; color: var(--muted) }
+.tile .cnt b { color: var(--ink); font-size: 1.4rem }
 .tile.team .cnt b { color: var(--black) }
 .tile.top { border-color: var(--yellow); box-shadow: 0 0 0 2px var(--yellow) inset, 0 0 2.2rem rgba(255, 203, 56, .25) }
-.crown { position: absolute; top: .6rem; right: .9rem; width: 3.4rem; height: 3.4rem; filter: drop-shadow(0 .2rem .4rem rgba(0,0,0,.6)); animation: bob 2.4s ease-in-out infinite }
+.crown { position: absolute; top: .4rem; right: .5rem; width: 2.3rem; height: 2.3rem; filter: drop-shadow(0 .2rem .4rem rgba(0,0,0,.6)); animation: bob 2.4s ease-in-out infinite }
 @keyframes bob { 50% { transform: translateY(-.25rem) rotate(-4deg) } }
-.ava { width: 2.6rem; height: 2.6rem; border-radius: 50%; object-fit: cover; background: var(--panel-2); flex: none; display: grid; place-items: center; font-size: 1.05rem; font-weight: 700; color: var(--yellow); overflow: hidden }
+.ava { width: 2rem; height: 2rem; border-radius: 50%; object-fit: cover; background: var(--panel-2); flex: none; display: grid; place-items: center; font-size: 1.05rem; font-weight: 700; color: var(--yellow); overflow: hidden }
 .ava img { width: 100%; height: 100%; object-fit: cover }
 
 .list { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0 }
@@ -82,6 +82,42 @@ td.marza { color: var(--yellow); font-weight: 700 }
 tr.fresh td { animation: fresh 3s ease-out 3 }
 @keyframes fresh { 0% { background: rgba(255, 203, 56, .35) } 100% { background: transparent } }
 .empty { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-size: 1.2rem }
+
+/* Rotacja dolnej części: umowy → leady → zadania (co 30 s) */
+.tabs { display: flex; gap: .4rem; align-items: center }
+.tabs .tab { font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: .2rem .7rem; border-radius: 2px; white-space: nowrap }
+.tabs .tab.on { background: var(--yellow); color: var(--black) }
+.tabs .tab .n { font-variant-numeric: tabular-nums }
+.tabs .tab.alarm:not(.on) { color: var(--red) }
+.list .head .info { margin-left: auto; color: var(--muted); font-size: 1rem }
+.list .bar { height: 3px; background: var(--line); position: relative; overflow: hidden }
+.list .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--yellow) }
+.list .bar i.run { animation: bar linear forwards }
+@keyframes bar { to { width: 100% } }
+.list { grid-template-rows: auto auto minmax(0, 1fr) }
+td.czeka { font-weight: 700; white-space: nowrap }
+td.czeka.ok { color: var(--green) }
+td.czeka.uwaga { color: var(--yellow) }
+td.czeka.alarm { color: var(--red) }
+.ludzie { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .8rem; padding: .6rem .8rem .8rem; height: 100%; min-height: 0 }
+.osoba { background: var(--panel-2); border: 1px solid var(--line); border-radius: 4px; padding: .7rem .8rem; display: grid; grid-template-rows: auto auto minmax(0, 1fr); gap: .5rem; min-height: 0; overflow: hidden }
+.osoba .kto { display: flex; align-items: center; gap: .6rem; font-size: 1.3rem; font-weight: 500; min-width: 0 }
+.osoba .kto span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.osoba .liczby { display: flex; gap: .4rem; flex-wrap: wrap; font-size: .85rem }
+.osoba .liczby span { padding: .1rem .45rem; border-radius: 2px; background: var(--panel); border: 1px solid var(--line); white-space: nowrap }
+.osoba .liczby b { font-size: 1rem }
+.osoba .liczby .z { color: var(--green) }
+.osoba .liczby .p { color: var(--red) }
+.osoba ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; align-content: start; overflow: hidden; min-height: 0; -webkit-mask-image: linear-gradient(#000 85%, transparent); mask-image: linear-gradient(#000 85%, transparent) }
+.osoba li { font-size: .95rem; line-height: 1.25; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: .45rem; align-items: start }
+.osoba li .t { overflow: hidden; white-space: nowrap; text-overflow: ellipsis }
+.osoba li.zam .t { color: var(--muted); text-decoration: line-through }
+.osoba li .h { color: var(--muted); font-variant-numeric: tabular-nums }
+.osoba li.sep { display: block; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-top: .3rem }
+.st.wtoku { background: var(--yellow-soft); color: var(--yellow) }
+.st.zamkniete { background: rgba(74, 222, 128, .15); color: var(--green) }
+.st.po { background: rgba(248, 113, 113, .15); color: var(--red) }
+.st.ile { background: var(--panel); color: var(--red); border: 1px solid #44443f }
 
 /* Fanfary */
 .fanfare { position: fixed; inset: 0; display: none; place-items: center; background: rgba(11, 11, 10, .88); z-index: 10; overflow: hidden }
@@ -131,7 +167,8 @@ tr.fresh td { animation: fresh 3s ease-out 3 }
   </div>
 
   <section class="list">
-    <div class="head"><h2>Umowy brokerskie w tym miesiącu</h2><span class="muted" id="list-count"></span></div>
+    <div class="head"><div class="tabs" id="tabs"></div><span class="info" id="list-count"></span></div>
+    <div class="bar"><i id="bar"></i></div>
     <div class="scroller" id="scroller"><div class="empty">Wczytuję…</div></div>
   </section>
 </div>
@@ -141,7 +178,7 @@ tr.fresh td { animation: fresh 3s ease-out 3 }
 <div class="overlay" id="setup">
   <form class="box" id="setup-form">
     <h2>Połącz ekran z Bitrix24</h2>
-    <p>Wklej adres webhooka przychodzącego z Bitrix24 (uprawnienia: crm, user). Zostanie zapisany tylko w tej przeglądarce. Ekran korzysta wyłącznie z metod odczytu.</p>
+    <p>Wklej adres webhooka przychodzącego z Bitrix24 (uprawnienia: crm, user, task). Zostanie zapisany tylko w tej przeglądarce. Ekran korzysta wyłącznie z metod odczytu.</p>
     <input id="setup-url" type="url" placeholder="https://carbe.bitrix24.pl/rest/…/…/" autocomplete="off" spellcheck="false" required>
     <div class="err" id="setup-err"></div>
     <button type="submit">Połącz</button>
@@ -178,6 +215,16 @@ const POLE = {
   brok: 'UF_CRM_1765543963858',       // Opłata brokerska brutto
   prow: 'UF_CRM_1779357017852',       // Prowizja z finansowania brutto
 };
+// Zespół w panelu „Zadania” (kolejność kart): zadania z terminem na dziś, po terminie i zamknięte dziś
+const ZESPOL = [
+  { id: '184', imie: 'Mateusz Uzarczyk' },
+  { id: '134', imie: 'Michał Wróblewski' },
+  { id: '136', imie: 'Kasia Pieroń' },
+  { id: '238', imie: 'Anna Sowa' },
+];
+const LEAD = { CATEGORY_ID: 0, STAGE_ID: 'PREPAYMENT_INVOICE' }; // etap „LEAD” w lejku „Sprzedaż własna” = temat jeszcze niepodjęty
+const LEAD_UWAGA_H = 4, LEAD_ALARM_H = 24;  // ile godzin lead może czekać: żółty od 4 h, czerwony od 24 h
+const ROTACJA_MS = 30 * 1000;
 const ODSWIEZ_MS = 60 * 1000;
 const KLUCZ_HOOK = 'carbe-tv-webhook';
 const KLUCZ_WIDZIANE = 'carbe-tv-widziane';
@@ -234,10 +281,12 @@ async function loadMeta() {
   const en = code => Object.fromEntries((f[code]?.items || []).map(i => [String(i.ID), i.VALUE]));
   const users = {};
   try {
-    const u = (await call('user.get', { filter: { ID: HANDLOWCY.map(h => h.id) } })).result || [];
+    const u = (await call('user.get', { filter: { ID: [...new Set([...HANDLOWCY, ...ZESPOL].map(h => h.id))] } })).result || [];
     u.forEach(x => users[String(x.ID)] = { imie: `${x.NAME || ''} ${x.LAST_NAME || ''}`.trim(), foto: x.PERSONAL_PHOTO || '' });
   } catch (e) { /* bez zakresu user – zostają nazwiska z ustawień */ }
-  meta = { typ: en(POLE.typ), fin: en(POLE.finansujacy), users };
+  const zrodla = {};
+  try { (await call('crm.status.list', { filter: { ENTITY_ID: 'SOURCE' } })).result.forEach(x => zrodla[x.STATUS_ID] = x.NAME) } catch (e) {}
+  meta = { typ: en(POLE.typ), fin: en(POLE.finansujacy), users, zrodla };
 }
 
 async function loadMonth(ms) {
@@ -302,8 +351,32 @@ async function loadMonth(ms) {
   return { umowy, rozliczone };
 }
 
+// Leady: deale na etapie „LEAD” – nikt ich jeszcze nie podjął
+async function loadLeady() {
+  const d = await list('crm.deal.list', { filter: LEAD, select: ['ID', 'TITLE', 'ASSIGNED_BY_ID', 'DATE_CREATE', 'SOURCE_ID', 'COMPANY_ID', 'CONTACT_ID'], order: { DATE_CREATE: 'ASC' } });
+  const l = d.filter(x => !testowy(x));
+  const firmy = {}, osoby = {};
+  const cid = [...new Set(l.map(x => x.COMPANY_ID).filter(v => +v))], kid = [...new Set(l.map(x => x.CONTACT_ID).filter(v => +v))];
+  try { for (const c of chunks(cid)) (await list('crm.company.list', { filter: { ID: c }, select: ['ID', 'TITLE'] })).forEach(f => firmy[f.ID] = f.TITLE) } catch (e) {}
+  try { for (const c of chunks(kid)) (await list('crm.contact.list', { filter: { ID: c }, select: ['ID', 'NAME', 'LAST_NAME'] })).forEach(k => osoby[k.ID] = `${k.NAME || ''} ${k.LAST_NAME || ''}`.trim()) } catch (e) {}
+  return l.map(x => {
+    const klient = [firmy[x.COMPANY_ID], osoby[x.CONTACT_ID]].filter(Boolean).join(' · ');
+    return { id: String(x.ID), tytul: klient || x.TITLE || '', nr: String(x.ID), kto: String(x.ASSIGNED_BY_ID), od: new Date(x.DATE_CREATE), zrodlo: meta.zrodla[x.SOURCE_ID] || '' };
+  });
+}
+
+// Zadania zespołu: otwarte z terminem do końca dnia (dziś + po terminie) i zamknięte dziś (wymaga uprawnienia „task” w webhooku)
+async function loadZadania() {
+  const now = new Date(), d0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()), d1 = new Date(d0.getTime() + 864e5);
+  const ids = ZESPOL.map(z => z.id), sel = ['ID', 'TITLE', 'STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'CLOSED_DATE'];
+  const otwarte = await list('tasks.task.list', { filter: { RESPONSIBLE_ID: ids, '<DEADLINE': isoLocal(d1), '<REAL_STATUS': 4 }, select: sel, order: { DEADLINE: 'ASC' } });
+  const zamkniete = await list('tasks.task.list', { filter: { RESPONSIBLE_ID: ids, '>=CLOSED_DATE': isoLocal(d0), REAL_STATUS: 5 }, select: sel, order: { CLOSED_DATE: 'ASC' } });
+  const z = t => ({ id: String(t.id), tytul: (t.title || '').trim(), kto: String(t.responsibleId), termin: t.deadline ? new Date(t.deadline) : null, zamk: t.closedDate ? new Date(t.closedDate) : null });
+  return { d0, otwarte: otwarte.map(z), zamkniete: zamkniete.map(z) };
+}
+
 // ---- Widok ----
-const nazwa = id => meta?.users[id]?.imie || HANDLOWCY.find(h => h.id === id)?.imie || 'Inna osoba';
+const nazwa = id => meta?.users[id]?.imie || [...HANDLOWCY, ...ZESPOL].find(h => h.id === id)?.imie || 'Inna osoba';
 const inicjaly = s => s.split(' ').map(x => x[0] || '').join('').slice(0, 2).toUpperCase();
 function ava(id) {
   const f = meta?.users[id]?.foto;
@@ -326,11 +399,13 @@ const slowoUmowa = n => n === 1 ? 'umowa' : (n % 10 >= 2 && n % 10 <= 4 && (n % 
 const slowoDeal = n => n === 1 ? 'deal' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'deale' : 'deali';
 
 let swieze = new Set();
+let scrollPause = 0;
 function render(d) {
   tiles($('tiles-umowy'), d.umowy, slowoUmowa);
   tiles($('tiles-rozl'), d.rozliczone, slowoDeal);
-  $('list-count').textContent = d.umowy.length ? `${d.umowy.length} · ${d.umowy.reduce((a, u) => a + u.auta.reduce((x, y) => x + y.ile, 0), 0)} aut` : '';
-  if (!d.umowy.length) { $('scroller').innerHTML = '<div class="empty">W tym miesiącu nie ma jeszcze podpisanych umów. Pierwsza odpali fanfary.</div>'; return }
+}
+function htmlUmowy(d) {
+  if (!d.umowy.length) return '<div class="empty">W tym miesiącu nie ma jeszcze podpisanych umów. Pierwsza odpali fanfary.</div>';
   const rows = d.umowy.map(u => `<tr class="${swieze.has(u.id) ? 'fresh' : ''}">
     <td class="num">${pad(u.kiedy.getDate())}.${pad(u.kiedy.getMonth() + 1)}</td>
     <td>${esc(nazwa(u.kto))}</td>
@@ -339,11 +414,83 @@ function render(d) {
     <td class="r num">${zl(u.rez)}</td><td class="r num">${zl(u.brok)}</td><td class="r num">${zl(u.prow)}</td>
     <td class="r num marza">${zl(u.marza)}</td>
     <td><span class="st ${u.status}">${u.status === 'otwarta' ? 'Otwarta' : u.status === 'rozliczona' ? 'Rozliczona' : 'Przegrana'}</span></td></tr>`).join('');
-  $('scroller').innerHTML = `<table><thead><tr><th>Data</th><th>Handlowiec</th><th>Samochód · ilość</th><th>Forma · finansujący</th><th class="r">Opł. rez.</th><th class="r">Opł. brok.</th><th class="r">Prowizja fin.</th><th class="r">Marża</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table><thead><tr><th>Data</th><th>Handlowiec</th><th>Samochód · ilość</th><th>Forma · finansujący</th><th class="r">Opł. rez.</th><th class="r">Opł. brok.</th><th class="r">Prowizja fin.</th><th class="r">Marża</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+const czas = ms => { const m = Math.max(0, Math.floor(ms / 6e4)), h = Math.floor(m / 60), d = Math.floor(h / 24); return d ? `${d} d ${h % 24} h` : h ? `${h} h ${m % 60} min` : `${m} min` };
+const godz = t => `${pad(t.getHours())}:${pad(t.getMinutes())}`;
+const dzien = t => `${pad(t.getDate())}.${pad(t.getMonth() + 1)}`;
+function htmlLeady(l) {
+  if (!l.length) return '<div class="empty">Wszystkie leady są podjęte. Brak tematów na etapie „LEAD”.</div>';
+  const now = Date.now();
+  const rows = l.map(x => {
+    const h = (now - x.od) / 36e5, kl = h >= LEAD_ALARM_H ? 'alarm' : h >= LEAD_UWAGA_H ? 'uwaga' : 'ok';
+    return `<tr><td class="num">${dzien(x.od)} ${godz(x.od)}</td><td class="czeka num ${kl}">${czas(now - x.od)}</td><td>${esc(nazwa(x.kto))}</td><td>${esc(x.tytul) || '<span class="muted">bez nazwy</span>'} <span class="muted num">#${x.nr}</span></td><td>${esc(x.zrodlo) || '<span class="muted">–</span>'}</td></tr>`;
+  }).join('');
+  return `<table><thead><tr><th>Wpłynął</th><th>Czeka</th><th>Opiekun</th><th>Klient · deal</th><th>Źródło</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function htmlZadania(z) {
+  const karty = ZESPOL.map(o => {
+    const dzis = z.otwarte.filter(t => t.kto === o.id && t.termin && t.termin >= z.d0);
+    const po = z.otwarte.filter(t => t.kto === o.id && t.termin && t.termin < z.d0);
+    const zam = z.zamkniete.filter(t => t.kto === o.id);
+    // dziś: w toku i zamknięte według godziny; po terminie: te same tytuły razem (np. „Analiza W/L ×33”)
+    const gd = {};
+    dzis.forEach(t => { const k = t.tytul.toLowerCase(); if (!gd[k]) gd[k] = { t, zam: false, h: t.termin, n: 0 }; gd[k].n++; if (t.termin < gd[k].h) gd[k].h = t.termin });
+    const lista = [...Object.values(gd), ...zam.map(t => ({ t, zam: true, h: t.zamk, n: 1 }))].sort((a, b) => a.h - b.h);
+    const grupy = {};
+    po.forEach(t => { const k = t.tytul.toLowerCase(); (grupy[k] = grupy[k] || { tytul: t.tytul, n: 0, ost: t.termin }).n++; if (t.termin > grupy[k].ost) grupy[k].ost = t.termin });
+    const gp = Object.values(grupy).sort((a, b) => b.n - a.n || b.ost - a.ost);
+    const MAXP = 6, reszta = gp.slice(MAXP).reduce((a, g) => a + g.n, 0);
+    const li = lista.map(x => `<li class="${x.zam ? 'zam' : ''}"><span class="st ${x.zam ? 'zamkniete' : 'wtoku'}">${x.zam ? 'zamknięte' : 'w toku'}</span><span class="t">${x.zam ? '' : `<span class="h">${godz(x.h)}</span> `}${esc(x.t.tytul)}${x.n > 1 ? ` <b class="num">×${x.n}</b>` : ''}</span></li>`).join('');
+    const lp = gp.slice(0, MAXP).map(g => `<li><span class="st ${g.n > 1 ? 'ile' : 'po'}">${g.n > 1 ? '×' + g.n : dzien(g.ost)}</span><span class="t">${esc(g.tytul)}</span></li>`).join('');
+    return `<div class="osoba"><div class="kto">${ava(o.id)}<span>${esc(nazwa(o.id).split(' ')[0])}</span></div>
+      <div class="liczby"><span>dziś w toku <b class="num">${dzis.length}</b></span><span class="z">zamknięte <b class="num">${zam.length}</b></span><span class="p">po terminie <b class="num">${po.length}</b></span></div>
+      <ul>${li || '<li class="sep">Na dziś brak zadań</li>'}${gp.length ? `<li class="sep">Po terminie</li>${lp}${reszta ? `<li class="sep">+ ${reszta} więcej</li>` : ''}` : ''}</ul></div>`;
+  }).join('');
+  return `<div class="ludzie">${karty}</div>`;
+}
+
+// ---- Rotacja dolnej części ----
+const PANELE = [
+  { k: 'umowy', tyt: 'Umowy brokerskie' },
+  { k: 'leady', tyt: 'Leady do podjęcia' },
+  { k: 'zadania', tyt: 'Zadania na dziś' },
+];
+const stan = { umowy: null, leady: null, zadania: null, bledy: {} };
+const STALY = new URLSearchParams(location.search).get('panel'); // np. ?panel=zadania – bez rotacji (podgląd)
+let panel = Math.max(0, PANELE.findIndex(p => p.k === STALY));
+function opisPanelu(k) {
+  if (k === 'umowy' && stan.umowy) { const u = stan.umowy.umowy; return u.length ? `${u.length} w tym miesiącu · ${u.reduce((a, x) => a + x.auta.reduce((s, y) => s + y.ile, 0), 0)} aut` : '' }
+  if (k === 'leady' && stan.leady) return stan.leady.length ? `najdłużej czeka ${czas(Date.now() - stan.leady[0].od)}` : '';
+  if (k === 'zadania' && stan.zadania) { const z = stan.zadania, po = z.otwarte.filter(t => t.termin && t.termin < z.d0).length; return `zespół: dziś w toku ${z.otwarte.length - po} · zamknięte ${z.zamkniete.length} · po terminie ${po}` }
+  return '';
+}
+function rysujPanel(reset) {
+  const p = PANELE[panel];
+  $('tabs').innerHTML = PANELE.map((x, i) => {
+    const n = x.k === 'leady' && stan.leady ? ` <span class="n">(${stan.leady.length})</span>` : '';
+    const alarm = x.k === 'leady' && stan.leady && stan.leady.some(l => (Date.now() - l.od) / 36e5 >= LEAD_ALARM_H);
+    return `<span class="tab${i === panel ? ' on' : ''}${alarm ? ' alarm' : ''}">${x.tyt}${n}</span>`;
+  }).join('');
+  $('list-count').textContent = opisPanelu(p.k);
+  let html;
+  if (stan.bledy[p.k]) html = `<div class="empty">${esc(stan.bledy[p.k])}</div>`;
+  else if (!stan[p.k]) html = '<div class="empty">Wczytuję…</div>';
+  else html = p.k === 'umowy' ? htmlUmowy(stan.umowy) : p.k === 'leady' ? htmlLeady(stan.leady) : htmlZadania(stan.zadania);
+  const s = $('scroller'), top = s.scrollTop;
+  s.innerHTML = html;
+  if (reset) { s.scrollTop = 0; scrollPause = 60 } else s.scrollTop = top;
+}
+function nastepnyPanel(pierwszy) {
+  if (!pierwszy && $('fanfare').classList.contains('on')) return;
+  if (!pierwszy && !STALY) panel = (panel + 1) % PANELE.length;
+  rysujPanel(true);
+  const b = $('bar'); b.classList.remove('run'); void b.offsetWidth;
+  if (!STALY) { b.style.animationDuration = ROTACJA_MS + 'ms'; b.classList.add('run') }
 }
 
 // Przewijanie listy, gdy nie mieści się na ekranie
-let scrollPause = 0;
 setInterval(() => {
   const s = $('scroller'); if (!s || s.scrollHeight <= s.clientHeight + 2) return;
   if (scrollPause > 0) { scrollPause--; return }
@@ -398,6 +545,11 @@ async function odswiez() {
     store.set(KLUCZ_WIDZIANE, JSON.stringify({ m: klucz, ids: d.umowy.map(u => u.id) }));
     $('month').textContent = ms.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
     render(d);
+    stan.umowy = d;
+    try { stan.leady = await loadLeady(); delete stan.bledy.leady } catch (e) { stan.bledy.leady = 'Nie udało się wczytać leadów: ' + e.message }
+    try { stan.zadania = await loadZadania(); delete stan.bledy.zadania }
+    catch (e) { stan.bledy.zadania = /scope|insufficient|access|denied|method/i.test(e.message) ? 'Webhook „Ekran TV” nie ma uprawnienia „Zadania” (task). Dodaj je w Bitrix24: Aplikacje → Dla programistów → Webhook „Ekran TV”.' : 'Nie udało się wczytać zadań: ' + e.message }
+    rysujPanel(false);
     nowe.slice().reverse().forEach(fanfara);
     $('stamp').textContent = 'Bitrix24 · odświeżono ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
     $('stamp').classList.remove('err');
@@ -450,6 +602,8 @@ function start() {
   else if (TEST) setTimeout(testFanfar, 1500);
   odswiez().catch(() => {});
   setInterval(() => odswiez().catch(() => {}), ODSWIEZ_MS);
+  nastepnyPanel(true);
+  setInterval(nastepnyPanel, ROTACJA_MS);
   pilnujWersji();
 }
 // Nowa wersja strony (np. po zmianie wyglądu) wczytuje się na TV sama: co 5 minut porównujemy plik strony z serwera
