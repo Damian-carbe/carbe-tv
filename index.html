@@ -410,8 +410,41 @@ async function odswiez() {
 }
 setInterval(() => { $('clock').textContent = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }) }, 1000);
 
+// ---- Ekran bez wygaszania (19.11) ----
+// 1) Wake Lock: prośba do przeglądarki, żeby nie wygaszała ekranu (odnawiana po powrocie strony na ekran i co minutę).
+// 2) Zapas dla przeglądarek TV bez Wake Lock: niewidoczne, wyciszone wideo w pętli – TV traktuje stronę jak odtwarzany film.
+// Nie obejdzie to automatycznego wyłączenia samego telewizora po kilku godzinach bez pilota (funkcja eko w menu TV).
+let wakeLock = null, wideo = null;
+function wideoTla() {
+  if (wideo) { if (wideo.paused) wideo.play().catch(() => {}); return }
+  try {
+    const c = document.createElement('canvas'); c.width = 2; c.height = 2;
+    if (!c.captureStream) return;
+    const ctx = c.getContext('2d'); let k = 0;
+    setInterval(() => { ctx.fillStyle = (k++ % 2) ? '#0b0b0a' : '#0c0c0b'; ctx.fillRect(0, 0, 2, 2) }, 1000);
+    wideo = document.createElement('video');
+    wideo.muted = true; wideo.loop = true; wideo.playsInline = true; wideo.setAttribute('playsinline', ''); wideo.setAttribute('muted', '');
+    wideo.srcObject = c.captureStream(1);
+    wideo.style.cssText = 'position:fixed;left:0;bottom:0;width:2px;height:2px;opacity:.01;pointer-events:none';
+    document.body.appendChild(wideo);
+    wideo.play().catch(() => {});
+  } catch (e) {}
+}
+async function trzymajEkran() {
+  try {
+    if ('wakeLock' in navigator && document.visibilityState === 'visible' && !wakeLock) {
+      wakeLock = await navigator.wakeLock.request('screen');
+      wakeLock.addEventListener('release', () => { wakeLock = null });
+    }
+  } catch (e) {}
+  wideoTla();
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') trzymajEkran() });
+setInterval(trzymajEkran, 60 * 1000);
+
 function start() {
   $('setup').classList.remove('on');
+  trzymajEkran();
   ensureAudio();
   if (!audio || audio.state !== 'running') { $('sound').classList.add('on'); $('sound-btn').focus() }
   else if (TEST) setTimeout(testFanfar, 1500);
@@ -440,7 +473,7 @@ async function pilnujWersji() {
 // Test fanfar z pilota: adres z ?test (gra po włączeniu dźwięku) albo żółty przycisk pilota; na klawiaturze F
 const TEST = new URLSearchParams(location.search).has('test');
 const testFanfar = () => { ensureAudio(); fanfara({ kto: '184', auta: [{ nazwa: 'Test fanfar', ile: 1 }], marza: 12345 }) };
-const wlaczDzwiek = () => { ensureAudio(); $('sound').classList.remove('on'); if (TEST) setTimeout(testFanfar, 400) };
+const wlaczDzwiek = () => { ensureAudio(); trzymajEkran(); $('sound').classList.remove('on'); if (TEST) setTimeout(testFanfar, 400) };
 $('sound-btn').addEventListener('click', wlaczDzwiek);
 document.addEventListener('keydown', e => {
   if ($('sound').classList.contains('on') && (e.key === 'Enter' || e.key === ' ' || e.keyCode === 13)) { e.preventDefault(); wlaczDzwiek(); return }
