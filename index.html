@@ -43,24 +43,24 @@ body { margin: 0; background: var(--black); color: var(--ink); font: 1rem/1.35 v
 .top .stamp.err { color: var(--red) }
 
 .sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem }
-.sec h2 { margin: 0 0 .4rem; font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: .6rem; align-items: baseline }
+.sec h2 { margin: 0 0 .3rem; font-size: .9rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); display: flex; gap: .6rem; align-items: baseline }
 .sec h2 span { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 /* zawsze ta sama siatka: zespół + miejsca na 3 handlowców (puste, gdy ktoś nie ma wyniku) – kafle nie skaczą */
-.tiles { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)); gap: .6rem; align-items: stretch }
-.tile { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: .6rem .8rem .7rem; display: grid; gap: .2rem; align-content: start; min-width: 0 }
+.tiles { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(0, 1fr)); gap: .5rem; align-items: stretch }
+.tile { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: .4rem .7rem .45rem; display: grid; gap: .1rem; align-content: start; min-width: 0 }
 .tile.team { background: var(--yellow); color: var(--black); border-color: var(--yellow) }
 .tile.team .lbl, .tile.team .cnt { color: rgba(11, 11, 10, .72) }
-.tile .lbl { font-size: 1.15rem; font-weight: 500; color: #e6e6e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .5rem; padding-right: 2.4rem }
+.tile .lbl { font-size: .9rem; font-weight: 500; color: #e6e6e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; gap: .4rem; padding-right: 1.8rem }
 .tile.team .lbl { padding-right: 0 }
-.tile .val { font-size: 1.8rem; font-weight: 700; line-height: 1.05; white-space: nowrap }
-.tile.team .val { font-size: 2.2rem }
-.tile .cnt { font-size: 1.05rem; color: var(--muted) }
-.tile .cnt b { color: var(--ink); font-size: 1.4rem }
+.tile .val { font-size: 1.35rem; font-weight: 700; line-height: 1.05; white-space: nowrap }
+.tile.team .val { font-size: 1.6rem }
+.tile .cnt { font-size: .85rem; color: var(--muted) }
+.tile .cnt b { color: var(--ink); font-size: 1.05rem }
 .tile.team .cnt b { color: var(--black) }
 .tile.top { border-color: var(--yellow); box-shadow: 0 0 0 2px var(--yellow) inset, 0 0 2.2rem rgba(255, 203, 56, .25) }
-.crown { position: absolute; top: .4rem; right: .5rem; width: 2.3rem; height: 2.3rem; filter: drop-shadow(0 .2rem .4rem rgba(0,0,0,.6)); animation: bob 2.4s ease-in-out infinite }
+.crown { position: absolute; top: .3rem; right: .4rem; width: 1.7rem; height: 1.7rem; filter: drop-shadow(0 .2rem .4rem rgba(0,0,0,.6)); animation: bob 2.4s ease-in-out infinite }
 @keyframes bob { 50% { transform: translateY(-.25rem) rotate(-4deg) } }
-.ava { width: 2rem; height: 2rem; border-radius: 50%; object-fit: cover; background: var(--panel-2); flex: none; display: grid; place-items: center; font-size: 1.05rem; font-weight: 700; color: var(--yellow); overflow: hidden }
+.ava { width: 1.6rem; height: 1.6rem; border-radius: 50%; object-fit: cover; background: var(--panel-2); flex: none; display: grid; place-items: center; font-size: .85rem; font-weight: 700; color: var(--yellow); overflow: hidden }
 .ava img { width: 100%; height: 100%; object-fit: cover }
 
 .list { background: var(--panel); border: 1px solid var(--line); border-radius: 4px; display: grid; grid-template-rows: auto minmax(0, 1fr); min-height: 0 }
@@ -83,18 +83,17 @@ tr.fresh td { animation: fresh 3s ease-out 3 }
 @keyframes fresh { 0% { background: rgba(255, 203, 56, .35) } 100% { background: transparent } }
 .empty { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-size: 1.2rem }
 
-/* Rotacja dolnej części: umowy → leady → zadania (co 30 s) */
-.tabs { display: flex; gap: .4rem; align-items: center }
-.tabs .tab { font-size: 1.05rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: .2rem .7rem; border-radius: 2px; white-space: nowrap }
-.tabs .tab.on { background: var(--yellow); color: var(--black) }
-.tabs .tab .n { font-variant-numeric: tabular-nums }
-.tabs .tab.alarm:not(.on) { color: var(--red) }
+/* Stały ekran (19.11): pod kaflami zawsze dwie sekcje – 1. leady do podjęcia, 2. zadania na dziś (bez rotacji) */
+.dol { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: .8rem; min-height: 0 }
+/* leady: najstarsze zawsze na górze, bez przewijania; sekcja rośnie do 46% ekranu, reszta jako „+ N nowszych” */
+.dol > .list:first-child { max-height: 46vh }
+#sc-leady td { padding: .35rem .7rem }
+#sc-leady tr.wiecej td { color: var(--muted); font-size: .9rem; border-bottom: 0 }
+.list .head h2 .n { color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: 0 }
+.list .head h2.alarm, .list .head h2.alarm .n { color: var(--red) }
 .list .head .info { margin-left: auto; color: var(--muted); font-size: 1rem }
-.list .bar { height: 3px; background: var(--line); position: relative; overflow: hidden }
-.list .bar i { position: absolute; inset: 0 auto 0 0; width: 0; background: var(--yellow) }
-.list .bar i.run { animation: bar linear forwards }
-@keyframes bar { to { width: 100% } }
-.list { grid-template-rows: auto auto minmax(0, 1fr) }
+.list .head { padding: .6rem 1rem .4rem }
+.ludzie { padding-top: .2rem }
 td.czeka { font-weight: 700; white-space: nowrap }
 td.czeka.ok { color: var(--green) }
 td.czeka.uwaga { color: var(--yellow) }
@@ -166,11 +165,16 @@ td.czeka.alarm { color: var(--red) }
     <section class="sec"><h2>Rozliczone <span>Leasing i Najem finansowanie · „Deal wygrany”</span></h2><div class="tiles" id="tiles-rozl"></div></section>
   </div>
 
-  <section class="list">
-    <div class="head"><div class="tabs" id="tabs"></div><span class="info" id="list-count"></span></div>
-    <div class="bar"><i id="bar"></i></div>
-    <div class="scroller" id="scroller"><div class="empty">Wczytuję…</div></div>
-  </section>
+  <div class="dol">
+    <section class="list">
+      <div class="head"><h2 id="h-leady">Leady do podjęcia</h2><span class="info" id="info-leady"></span></div>
+      <div class="scroller" id="sc-leady"><div class="empty">Wczytuję…</div></div>
+    </section>
+    <section class="list">
+      <div class="head"><h2>Zadania na dziś</h2><span class="info" id="info-zadania"></span></div>
+      <div class="scroller" id="sc-zadania"><div class="empty">Wczytuję…</div></div>
+    </section>
+  </div>
 </div>
 
 <div class="fanfare" id="fanfare" aria-live="assertive"></div>
@@ -224,7 +228,6 @@ const ZESPOL = [
 ];
 const LEAD = { CATEGORY_ID: 0, STAGE_ID: 'PREPAYMENT_INVOICE' }; // etap „LEAD” w lejku „Sprzedaż własna” = temat jeszcze niepodjęty
 const LEAD_UWAGA_H = 4, LEAD_ALARM_H = 24;  // ile godzin lead może czekać: żółty od 4 h, czerwony od 24 h
-const ROTACJA_MS = 30 * 1000;
 const ODSWIEZ_MS = 60 * 1000;
 const KLUCZ_HOOK = 'carbe-tv-webhook';
 const KLUCZ_WIDZIANE = 'carbe-tv-widziane';
@@ -354,7 +357,7 @@ async function loadMonth(ms) {
 // Leady: deale na etapie „LEAD” – nikt ich jeszcze nie podjął
 async function loadLeady() {
   const d = await list('crm.deal.list', { filter: LEAD, select: ['ID', 'TITLE', 'ASSIGNED_BY_ID', 'DATE_CREATE', 'SOURCE_ID', 'COMPANY_ID', 'CONTACT_ID'], order: { DATE_CREATE: 'ASC' } });
-  const l = d.filter(x => !testowy(x));
+  const l = d.filter(x => !testowy(x)).sort((a, b) => new Date(a.DATE_CREATE) - new Date(b.DATE_CREATE)); // najstarsze na górze
   const firmy = {}, osoby = {};
   const cid = [...new Set(l.map(x => x.COMPANY_ID).filter(v => +v))], kid = [...new Set(l.map(x => x.CONTACT_ID).filter(v => +v))];
   try { for (const c of chunks(cid)) (await list('crm.company.list', { filter: { ID: c }, select: ['ID', 'TITLE'] })).forEach(f => firmy[f.ID] = f.TITLE) } catch (e) {}
@@ -399,24 +402,10 @@ const slowoUmowa = n => n === 1 ? 'umowa' : (n % 10 >= 2 && n % 10 <= 4 && (n % 
 const slowoDeal = n => n === 1 ? 'deal' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'deale' : 'deali';
 
 let swieze = new Set();
-let scrollPause = 0;
 function render(d) {
   tiles($('tiles-umowy'), d.umowy, slowoUmowa);
   tiles($('tiles-rozl'), d.rozliczone, slowoDeal);
 }
-function htmlUmowy(d) {
-  if (!d.umowy.length) return '<div class="empty">W tym miesiącu nie ma jeszcze podpisanych umów. Pierwsza odpali fanfary.</div>';
-  const rows = d.umowy.map(u => `<tr class="${swieze.has(u.id) ? 'fresh' : ''}">
-    <td class="num">${pad(u.kiedy.getDate())}.${pad(u.kiedy.getMonth() + 1)}</td>
-    <td>${esc(nazwa(u.kto))}</td>
-    <td class="car">${u.auta.length ? u.auta.map(a => `<b>${esc(a.nazwa)}</b><span class="q num">×${a.ile}</span>`).join('<br>') : '<span class="muted">brak modelu</span>'}</td>
-    <td class="fin">${esc(u.typ) || '<span class="muted">–</span>'}<div class="sub">${esc(u.finansujacy) || 'finansujący: –'}</div></td>
-    <td class="r num">${zl(u.rez)}</td><td class="r num">${zl(u.brok)}</td><td class="r num">${zl(u.prow)}</td>
-    <td class="r num marza">${zl(u.marza)}</td>
-    <td><span class="st ${u.status}">${u.status === 'otwarta' ? 'Otwarta' : u.status === 'rozliczona' ? 'Rozliczona' : 'Przegrana'}</span></td></tr>`).join('');
-  return `<table><thead><tr><th>Data</th><th>Handlowiec</th><th>Samochód · ilość</th><th>Forma · finansujący</th><th class="r">Opł. rez.</th><th class="r">Opł. brok.</th><th class="r">Prowizja fin.</th><th class="r">Marża</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
-}
-
 const czas = ms => { const m = Math.max(0, Math.floor(ms / 6e4)), h = Math.floor(m / 60), d = Math.floor(h / 24); return d ? `${d} d ${h % 24} h` : h ? `${h} h ${m % 60} min` : `${m} min` };
 const godz = t => `${pad(t.getHours())}:${pad(t.getMinutes())}`;
 const dzien = t => `${pad(t.getDate())}.${pad(t.getMonth() + 1)}`;
@@ -451,51 +440,43 @@ function htmlZadania(z) {
   return `<div class="ludzie">${karty}</div>`;
 }
 
-// ---- Rotacja dolnej części ----
-const PANELE = [
-  { k: 'umowy', tyt: 'Umowy brokerskie' },
-  { k: 'leady', tyt: 'Leady do podjęcia' },
-  { k: 'zadania', tyt: 'Zadania na dziś' },
-];
-const stan = { umowy: null, leady: null, zadania: null, bledy: {} };
-const STALY = new URLSearchParams(location.search).get('panel'); // np. ?panel=zadania – bez rotacji (podgląd)
-let panel = Math.max(0, PANELE.findIndex(p => p.k === STALY));
-function opisPanelu(k) {
-  if (k === 'umowy' && stan.umowy) { const u = stan.umowy.umowy; return u.length ? `${u.length} w tym miesiącu · ${u.reduce((a, x) => a + x.auta.reduce((s, y) => s + y.ile, 0), 0)} aut` : '' }
-  if (k === 'leady' && stan.leady) return stan.leady.length ? `najdłużej czeka ${czas(Date.now() - stan.leady[0].od)}` : '';
-  if (k === 'zadania' && stan.zadania) { const z = stan.zadania, po = z.otwarte.filter(t => t.termin && t.termin < z.d0).length; return `zespół: dziś w toku ${z.otwarte.length - po} · zamknięte ${z.zamkniete.length} · po terminie ${po}` }
-  return '';
-}
-function rysujPanel(reset) {
-  const p = PANELE[panel];
-  $('tabs').innerHTML = PANELE.map((x, i) => {
-    const n = x.k === 'leady' && stan.leady ? ` <span class="n">(${stan.leady.length})</span>` : '';
-    const alarm = x.k === 'leady' && stan.leady && stan.leady.some(l => (Date.now() - l.od) / 36e5 >= LEAD_ALARM_H);
-    return `<span class="tab${i === panel ? ' on' : ''}${alarm ? ' alarm' : ''}">${x.tyt}${n}</span>`;
-  }).join('');
-  $('list-count').textContent = opisPanelu(p.k);
-  let html;
-  if (stan.bledy[p.k]) html = `<div class="empty">${esc(stan.bledy[p.k])}</div>`;
-  else if (!stan[p.k]) html = '<div class="empty">Wczytuję…</div>';
-  else html = p.k === 'umowy' ? htmlUmowy(stan.umowy) : p.k === 'leady' ? htmlLeady(stan.leady) : htmlZadania(stan.zadania);
-  const s = $('scroller'), top = s.scrollTop;
-  s.innerHTML = html;
-  if (reset) { s.scrollTop = 0; scrollPause = 60 } else s.scrollTop = top;
-}
-function nastepnyPanel(pierwszy) {
-  if (!pierwszy && $('fanfare').classList.contains('on')) return;
-  if (!pierwszy && !STALY) panel = (panel + 1) % PANELE.length;
-  rysujPanel(true);
-  const b = $('bar'); b.classList.remove('run'); void b.offsetWidth;
-  if (!STALY) { b.style.animationDuration = ROTACJA_MS + 'ms'; b.classList.add('run') }
+// ---- Dolna część: stały ekran, dwie sekcje naraz (19.11 – bez rotacji i bez listy umów) ----
+const stan = { leady: null, zadania: null, bledy: {} };
+function wstaw(id, html) { const s = $(id), top = s.scrollTop; s.innerHTML = html; s.scrollTop = top }
+function rysujDol() {
+  const l = stan.leady, z = stan.zadania;
+  const alarm = l && l.some(x => (Date.now() - x.od) / 36e5 >= LEAD_ALARM_H);
+  $('h-leady').className = alarm ? 'alarm' : '';
+  $('h-leady').innerHTML = 'Leady do podjęcia' + (l ? ` <span class="n">(${l.length})</span>` : '');
+  $('info-leady').textContent = l && l.length ? `najdłużej czeka ${czas(Date.now() - l[0].od)}` : '';
+  wstaw('sc-leady', stan.bledy.leady ? `<div class="empty">${esc(stan.bledy.leady)}</div>` : l ? htmlLeady(l) : '<div class="empty">Wczytuję…</div>');
+  przytnijLeady();
+  if (z) { const po = z.otwarte.filter(t => t.termin && t.termin < z.d0).length; $('info-zadania').textContent = `zespół: dziś w toku ${z.otwarte.length - po} · zamknięte ${z.zamkniete.length} · po terminie ${po}` }
+  wstaw('sc-zadania', stan.bledy.zadania ? `<div class="empty">${esc(stan.bledy.zadania)}</div>` : z ? htmlZadania(z) : '<div class="empty">Wczytuję…</div>');
 }
 
-// Przewijanie listy, gdy nie mieści się na ekranie
+// Leady: nie przewijamy (najstarsze mają być widoczne na górze). Co się nie mieści, zastępuje wiersz „+ N nowszych”.
+function przytnijLeady() {
+  const s = $('sc-leady'); s.scrollTop = 0;
+  const tb = s.querySelector('tbody'); if (!tb) return;
+  tb.querySelectorAll('tr.wiecej').forEach(r => r.remove());
+  const rows = [...tb.rows]; rows.forEach(r => r.style.display = '');
+  if (s.scrollHeight <= s.clientHeight + 2) return;
+  const extra = document.createElement('tr'); extra.className = 'wiecej'; extra.innerHTML = '<td colspan="5"></td>'; tb.appendChild(extra);
+  let ukryte = 0;
+  for (let i = rows.length - 1; i > 0 && s.scrollHeight > s.clientHeight + 2; i--) { rows[i].style.display = 'none'; ukryte++; extra.firstChild.textContent = `+ ${ukryte} nowszych ${ukryte === 1 ? 'lead' : ukryte < 5 ? 'leady' : 'leadów'}` }
+}
+window.addEventListener('resize', przytnijLeady);
+
+// Przewijanie pozostałych list, gdy nie mieszczą się w swojej sekcji (każda sekcja osobno)
+const pauza = {};
 setInterval(() => {
-  const s = $('scroller'); if (!s || s.scrollHeight <= s.clientHeight + 2) return;
-  if (scrollPause > 0) { scrollPause--; return }
-  if (s.scrollTop + s.clientHeight >= s.scrollHeight - 1) { scrollPause = 120; setTimeout(() => { s.scrollTop = 0; scrollPause = 120 }, 4000); return }
-  s.scrollTop += 1;
+  document.querySelectorAll('.scroller:not(#sc-leady)').forEach(s => {
+    if (s.scrollHeight <= s.clientHeight + 2) return;
+    if ((pauza[s.id] || 0) > 0) { pauza[s.id]--; return }
+    if (s.scrollTop + s.clientHeight >= s.scrollHeight - 1) { pauza[s.id] = 1e9; setTimeout(() => { s.scrollTop = 0; pauza[s.id] = 120 }, 4000); return }
+    s.scrollTop += 1;
+  });
 }, 40);
 
 // ---- Fanfary ----
@@ -545,11 +526,10 @@ async function odswiez() {
     store.set(KLUCZ_WIDZIANE, JSON.stringify({ m: klucz, ids: d.umowy.map(u => u.id) }));
     $('month').textContent = ms.toLocaleDateString('pl-PL', { month: 'long', year: 'numeric' });
     render(d);
-    stan.umowy = d;
     try { stan.leady = await loadLeady(); delete stan.bledy.leady } catch (e) { stan.bledy.leady = 'Nie udało się wczytać leadów: ' + e.message }
     try { stan.zadania = await loadZadania(); delete stan.bledy.zadania }
     catch (e) { stan.bledy.zadania = /scope|insufficient|access|denied|method/i.test(e.message) ? 'Webhook „Ekran TV” nie ma uprawnienia „Zadania” (task). Dodaj je w Bitrix24: Aplikacje → Dla programistów → Webhook „Ekran TV”.' : 'Nie udało się wczytać zadań: ' + e.message }
-    rysujPanel(false);
+    rysujDol();
     nowe.slice().reverse().forEach(fanfara);
     $('stamp').textContent = 'Bitrix24 · odświeżono ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
     $('stamp').classList.remove('err');
@@ -602,8 +582,7 @@ function start() {
   else if (TEST) setTimeout(testFanfar, 1500);
   odswiez().catch(() => {});
   setInterval(() => odswiez().catch(() => {}), ODSWIEZ_MS);
-  nastepnyPanel(true);
-  setInterval(nastepnyPanel, ROTACJA_MS);
+  rysujDol();
   pilnujWersji();
 }
 // Nowa wersja strony (np. po zmianie wyglądu) wczytuje się na TV sama: co 5 minut porównujemy plik strony z serwera
