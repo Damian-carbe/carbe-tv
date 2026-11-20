@@ -423,19 +423,24 @@ function htmlZadania(z) {
     const dzis = z.otwarte.filter(t => t.kto === o.id && t.termin && t.termin >= z.d0);
     const po = z.otwarte.filter(t => t.kto === o.id && t.termin && t.termin < z.d0);
     const zam = z.zamkniete.filter(t => t.kto === o.id);
-    // dziś: w toku i zamknięte według godziny; po terminie: te same tytuły razem (np. „Analiza W/L ×33”)
+    // kolejność (20.11): 1) po terminie (te same tytuły razem, np. „Analiza W/L ×33”), 2) dziś w toku wg godziny, 3) zamknięte dziś wg godziny zamknięcia
     const gd = {};
-    dzis.forEach(t => { const k = t.tytul.toLowerCase(); if (!gd[k]) gd[k] = { t, zam: false, h: t.termin, n: 0 }; gd[k].n++; if (t.termin < gd[k].h) gd[k].h = t.termin });
-    const lista = [...Object.values(gd), ...zam.map(t => ({ t, zam: true, h: t.zamk, n: 1 }))].sort((a, b) => a.h - b.h);
+    dzis.forEach(t => { const k = t.tytul.toLowerCase(); if (!gd[k]) gd[k] = { t, h: t.termin, n: 0 }; gd[k].n++; if (t.termin < gd[k].h) gd[k].h = t.termin });
+    const wtoku = Object.values(gd).sort((a, b) => a.h - b.h);
+    const zamk = zam.slice().sort((a, b) => a.zamk - b.zamk);
     const grupy = {};
     po.forEach(t => { const k = t.tytul.toLowerCase(); (grupy[k] = grupy[k] || { tytul: t.tytul, n: 0, ost: t.termin }).n++; if (t.termin > grupy[k].ost) grupy[k].ost = t.termin });
     const gp = Object.values(grupy).sort((a, b) => b.n - a.n || b.ost - a.ost);
     const MAXP = 6, reszta = gp.slice(MAXP).reduce((a, g) => a + g.n, 0);
-    const li = lista.map(x => `<li class="${x.zam ? 'zam' : ''}"><span class="st ${x.zam ? 'zamkniete' : 'wtoku'}">${x.zam ? 'zamknięte' : 'w toku'}</span><span class="t">${x.zam ? '' : `<span class="h">${godz(x.h)}</span> `}${esc(x.t.tytul)}${x.n > 1 ? ` <b class="num">×${x.n}</b>` : ''}</span></li>`).join('');
     const lp = gp.slice(0, MAXP).map(g => `<li><span class="st ${g.n > 1 ? 'ile' : 'po'}">${g.n > 1 ? '×' + g.n : dzien(g.ost)}</span><span class="t">${esc(g.tytul)}</span></li>`).join('');
+    const lw = wtoku.map(x => `<li><span class="st wtoku">w toku</span><span class="t"><span class="h">${godz(x.h)}</span> ${esc(x.t.tytul)}${x.n > 1 ? ` <b class="num">×${x.n}</b>` : ''}</span></li>`).join('');
+    const lz = zamk.map(t => `<li class="zam"><span class="st zamkniete">zamknięte</span><span class="t">${esc(t.tytul)}</span></li>`).join('');
+    const li = (gp.length ? `<li class="sep">Po terminie</li>${lp}${reszta ? `<li class="sep">+ ${reszta} więcej po terminie</li>` : ''}` : '')
+      + (wtoku.length ? `<li class="sep">Dziś w toku</li>${lw}` : '')
+      + (zamk.length ? `<li class="sep">Zamknięte dziś</li>${lz}` : '');
     return `<div class="osoba"><div class="kto">${ava(o.id)}<span>${esc(nazwa(o.id).split(' ')[0])}</span></div>
-      <div class="liczby"><span>dziś w toku <b class="num">${dzis.length}</b></span><span class="z">zamknięte <b class="num">${zam.length}</b></span><span class="p">po terminie <b class="num">${po.length}</b></span></div>
-      <ul>${li || '<li class="sep">Na dziś brak zadań</li>'}${gp.length ? `<li class="sep">Po terminie</li>${lp}${reszta ? `<li class="sep">+ ${reszta} więcej</li>` : ''}` : ''}</ul></div>`;
+      <div class="liczby"><span class="p">po terminie <b class="num">${po.length}</b></span><span>dziś w toku <b class="num">${dzis.length}</b></span><span class="z">zamknięte <b class="num">${zam.length}</b></span></div>
+      <ul>${li || '<li class="sep">Na dziś brak zadań</li>'}</ul></div>`;
   }).join('');
   return `<div class="ludzie">${karty}</div>`;
 }
